@@ -1,0 +1,16 @@
+{
+  "name": "todo-app-js-native",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "backend": "node ./todo-server",
+    "client": "http-server -o",
+    "start": "concurrently \"npm run backend\" \"npm run client\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "http-server": "^14.1.1"
+  }
+}
