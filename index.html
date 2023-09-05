@@ -1,45 +1,51 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <title>TODO</title>
-    <meta charset="UTF-8">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-		<script type="module">
-			import {createTodoApp} from './todo-app/view.js';
-      import {createSwitchStorageButton} from './todo-app/storage-switch.js';
 
-			const owner = 'Я';
-      const todoApp = document.getElementById('todo-app');
-      todoApp.prepend(createSwitchStorageButton(owner));
-      const isStorageLocal = JSON.parse(localStorage.getItem(owner)).isStorageLocal;
+<head>
+  <title>todo-app</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+    integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  <script type="module">
+    import { createTodoApp } from './todo-app/view.js';
+    import { createSwitchStorageButton } from './todo-app/storage-switch.js';
+    import { loader } from './todo-app/loader.js';
+    import { warning } from './todo-app/warning.js';
 
-      (async () => {
-        if (isStorageLocal) {
-          const {
-            getTodoList,
-            createTodoItem,
-            switchTodoItemDone,
-            deleteTodoItem,
-          } = await import('./todo-app/local.js');
-          const todoItemList = getTodoList(owner);
+    const owner = 'first';
+    const todoApp = document.getElementById('todo-app');
+    todoApp.prepend(createSwitchStorageButton(owner));
+    const isStorageLocal = JSON.parse(localStorage.getItem(owner)).isStorageLocal;
 
-          createTodoApp(todoApp, {
-            title: 'Основной список дел',
-            owner,
-            todoItemList,
-            onCreateFormSubmit: createTodoItem(owner),
-            onDoneClick: switchTodoItemDone,
-            onDeleteClick: deleteTodoItem,
-          })
-        } else {
-          const {
-            getTodoList,
-            createTodoItem,
-            switchTodoItemDone,
-            deleteTodoItem,
-          } = await import('./todo-app/api.js');
+    (async () => {
+      if (isStorageLocal) {
+        const {
+          getTodoList,
+          createTodoItem,
+          switchTodoItemDone,
+          deleteTodoItem,
+        } = await import('./todo-app/local.js');
+        const todoItemList = getTodoList(owner);
+
+        createTodoApp(todoApp, {
+          title: 'Основной список дел',
+          owner,
+          todoItemList,
+          onCreateFormSubmit: createTodoItem(owner),
+          onDoneClick: switchTodoItemDone,
+          onDeleteClick: deleteTodoItem,
+        })
+      } else {
+        const {
+          getTodoList,
+          createTodoItem,
+          switchTodoItemDone,
+          deleteTodoItem,
+        } = await import('./todo-app/api.js');
+        const spinner = loader();
+        try {
+          todoApp.append(spinner);
           const todoItemList = await getTodoList(owner);
-
           createTodoApp(todoApp, {
             title: 'Основной список дел',
             owner,
@@ -48,18 +54,26 @@
             onDoneClick: switchTodoItemDone,
             onDeleteClick: deleteTodoItem,
           })
+        } catch (err) {
+          const warnEl = warning();
+          todoApp.append(warnEl);
+        } finally {
+          spinner.remove();
         }
-      })();
-		</script>
-  </head>
-  <body>
-		<div class="container mb-4">
-			<nav class="nav">
-				<a href="index.html" class="nav-link">Основной список дел</a>
-				<a href="second.html" class="nav-link">Дополнительный список дел №1</a>
-				<a href="third.html" class="nav-link">Дополнительный список дел №2</a>
-			</nav>
-		</div>
-		<div id="todo-app" class="container"></div>
-  </body>
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="container mb-4">
+    <nav class="nav">
+      <a href="index.html" class="nav-link text-info">Основной список дел</a>
+      <a href="second.html" class="nav-link">Дополнительный список дел №1</a>
+      <a href="third.html" class="nav-link">Дополнительный список дел №2</a>
+    </nav>
+  </div>
+  <div id="todo-app" class="container"></div>
+</body>
+
 </html>

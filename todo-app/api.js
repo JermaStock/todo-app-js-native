@@ -31,7 +31,7 @@ export async function switchTodoItemDone({todoItem}) {
 export async function deleteTodoItem({ element, todoItem }) {
 	if (!confirm('Вы уверены?')) {
 		return;
-	} 
+	}
 	element.remove();
 	fetch(`http://localhost:3000/api/todos/${todoItem.id}`, {
 		method: 'DELETE',
